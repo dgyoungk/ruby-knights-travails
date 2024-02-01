@@ -1,2 +1,4 @@
-# ruby-knights-travails
-TOP FS Ruby DSA Project: Knights Travails
+## TOP FS Ruby DSA Project: Knights Travails
+
+
+Author: Daniel Kwon 2024
