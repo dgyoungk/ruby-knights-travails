@@ -1,6 +1,6 @@
 ## TOP FS Ruby DSA Project: Knights Travails
 
-A rough representation of an unweighted, undirected graph created from Node objects
+A rough representation of an unweighted, undirected Graph created from Node objects
     - meant to resemble a chess board
 
 ## Classes and Methods:
