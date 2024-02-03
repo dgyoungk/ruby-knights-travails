@@ -8,7 +8,7 @@ class Node
     self.neighbours = []
   end
 
-  def add_edge(adjacent)
+  def add_vertex(adjacent)
     self.neighbours << adjacent
   end
 

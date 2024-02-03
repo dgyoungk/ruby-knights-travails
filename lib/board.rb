@@ -12,7 +12,6 @@ class Board
     @coordinates = (0..7).to_a.repeated_permutation(2).to_a
     build_graph
     graph_edges
-    clean_edges
   end
 
   def add_node(node)
@@ -20,8 +19,8 @@ class Board
   end
 
   def add_edges(node1, node2)
-    self.squares[node1].add_edge(self.squares[node2])
-    self.squares[node2].add_edge(self.squares[node1])
+    self.squares[node1].add_vertex(self.squares[node2])
+    self.squares[node2].add_vertex(self.squares[node1])
   end
 
   def build_graph
@@ -51,9 +50,6 @@ class Board
     end
   end
 
-  def clean_edges
-    self.squares.each { |coords, node| node.neighbours = node.neighbours.uniq }
-  end
 
   def knight_moves(start_coords, end_coords, parent = {}, visited = [], to_visit = [], dist = {})
     # parent keeps track of previous nodes (vertices)
