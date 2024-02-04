@@ -13,6 +13,11 @@ A rough representation of an unweighted, undirected Graph created from Node obje
     - methods:
         - #add_vertex: adds an adjancent Node object to the neighbours array
 
+### Knight class:
+    - represents the Knight chess piece
+    - attributes: 
+        - possible_moves: an array of move combinations that a Knight can do
+
 ### Board class:
     - represents the chess board (Graph Data Structure)
     - attributes: 
