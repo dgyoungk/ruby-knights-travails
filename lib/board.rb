@@ -3,13 +3,16 @@
 # hash key: coords
 # value for hash key: LinkedList of all the nodes that are adjacent to the key (vertex)
 require_relative 'node.rb'
+require_relative 'knight.rb'
 
 class Board
   attr_accessor :squares
+  attr_reader :k_moves, :coordinates
 
   def initialize
     self.squares = {}
     @coordinates = (0..7).to_a.repeated_permutation(2).to_a
+    @k_moves = Knight.new.possible_moves
     build_graph
     graph_edges
   end
@@ -25,45 +28,36 @@ class Board
 
   def build_graph
     # iterate through the coordinates, make a new Node object, and call add_node
-    @coordinates.each_with_index do |pair, idx|
+    coordinates.each do |pair|
       new_node = Node.new(pair)
       add_node(new_node)
     end
   end
 
   def graph_edges
-    # to add edges I need 2 node coords, how do I get the other one...
-    # pick it up here, figure out how to calculate the index of the next item
-    self.squares.each_with_index do |(coords, node), idx|
-      row = squares.select { |coords, node| coords.first == idx }
-      row.each do |coords, node|
-        # case for first row
-        add_edges(coords, [coords.first + 2, coords.last + 1]) unless self.squares[[coords.first + 2, coords.last + 1]].nil?
-        add_edges(coords, [coords.first + 2, coords.last - 1]) unless self.squares[[coords.first + 2, coords.last - 1]].nil?
-        add_edges(coords, [coords.first + 1, coords.last + 2]) unless self.squares[[coords.first + 1, coords.last + 2]].nil?
-        add_edges(coords, [coords.first + 1, coords.last - 2]) unless self.squares[[coords.first + 1, coords.last - 2]].nil?
-        add_edges(coords, [coords.first - 1, coords.last + 2]) unless self.squares[[coords.first - 1, coords.last + 2]].nil?
-        add_edges(coords, [coords.first - 1, coords.last - 2]) unless self.squares[[coords.first - 1, coords.last - 2]].nil?
-        add_edges(coords, [coords.first - 2, coords.last + 1]) unless self.squares[[coords.first - 2, coords.last + 1]].nil?
-        add_edges(coords, [coords.first - 2, coords.last - 1]) unless self.squares[[coords.first - 2, coords.last - 1]].nil?
+    self.squares.each do |coords, node|
+      k_moves.each do |move|
+        unless self.squares[[coords.first + move.first, coords.last + move.last]].nil?
+          add_edges(coords, [coords.first + move.first, coords.last + move.last])
+        end
       end
     end
   end
 
 
   def knight_moves(start_coords, end_coords, parent = {}, visited = [], to_visit = [], dist = {})
-    # parent keeps track of previous nodes (vertices)
-    # to_visit is the queue
-    # visited is the array to store visited nodes
-    # I also need a collection for the edge numbers
-    start_node = self.squares[start_coords]
-    visited << start_node
-    to_visit << start_node
-    parent[start_node.coords] = start_node
-    dist[start_node.coords] = 0
+    if start_coords.any? { |coord| coord < 0 || coord > 7 } || end_coords.any? { |coord| coord < 0 || coord > 7 }
+      display_error_msg(start_coords, end_coords)
+      return
+    end
+    # parent keeps track of the node path, to_visit is the queue, dist keeps track of each node's edge count from the starting coords
+    visited << self.squares[start_coords]
+    to_visit << self.squares[start_coords]
+    parent[start_coords] = self.squares[start_coords]
+    dist[start_coords] = 0
     while !to_visit.empty?
-      current_node = to_visit.shift
-      current_node.neighbours.each do |node|
+        current_node = to_visit.shift
+        current_node.neighbours.each do |node|
         unless visited.include?(node)
           to_visit << node
           visited << node
@@ -72,16 +66,23 @@ class Board
         end
       end
     end
+    moves_output(dist, parent, start_coords, end_coords)
+  end
+
+  def display_error_msg(start_coords, end_coords)
+    puts %(The square with coordinates #{self.squares[start_coords].nil? ? start_coords : end_coords} doesn't exist)
+  end
+
+  def moves_output(dist, parent, start_coords, end_coords)
     path = []
     destination = self.squares[end_coords]
     path << destination
-    while parent[destination.coords] != start_node
+    while parent[destination.coords] != self.squares[start_coords]
       path << parent[destination.coords]
       destination = parent[destination.coords]
     end
-    path << start_node
-    # outputting results
-    puts %(Achieved with #{dist[end_coords]} move(s), from #{start_coords} to #{end_coords}:)
+    path << self.squares[start_coords]
+    puts %(Moving from #{start_coords} to #{end_coords} took #{dist[end_coords]} move(s):)
     path.size.downto(0) do |n|
       p path[n].coords unless path[n].nil?
     end
