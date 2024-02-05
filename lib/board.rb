@@ -56,8 +56,8 @@ class Board
     parent[start_coords] = self.squares[start_coords]
     dist[start_coords] = 0
     while !to_visit.empty?
-        current_node = to_visit.shift
-        current_node.neighbours.each do |node|
+      current_node = to_visit.shift
+      current_node.neighbours.each do |node|
         unless visited.include?(node)
           to_visit << node
           visited << node
